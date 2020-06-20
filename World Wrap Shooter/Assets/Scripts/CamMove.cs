@@ -26,6 +26,8 @@ public class CamMove : MonoBehaviour
     [Tooltip("The right leading camera")]
     public Transform _rightCam;
 
+    public Vector3 PositionXY => new Vector3(transform.position.x, transform.position.y, 0);
+
     void Start()
     {
         _z = transform.position.z;

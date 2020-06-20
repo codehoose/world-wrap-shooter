@@ -11,6 +11,7 @@ public class ShipMove : MonoBehaviour
 
     private SpriteRenderer _spriteRenderer;
     private Direction _direction = Direction.Right;
+    private Vector3 _transform;
 
     [Tooltip("The left most screen position the ship is allowed")]
     public float _leftMostX = -0.3f;
@@ -27,9 +28,13 @@ public class ShipMove : MonoBehaviour
     [Tooltip("The bottom most screen position the ship is allowed")]
     public float _bottomExtreme = 0.75f;
 
+    [Tooltip("The camera movement script. This gives us the offset")]
+    public CamMove _camMove;
+
     void Awake()
     {
         _spriteRenderer = GetComponent<SpriteRenderer>();
+        _transform = transform.localPosition;
     }
 
     void Update()
@@ -46,21 +51,23 @@ public class ShipMove : MonoBehaviour
 
         DoHorizontal();
         DoVertical();
+
+        transform.localPosition = _transform;
     }
 
     void DoVertical()
     {
         var y = Input.GetAxis("Vertical");
         var offset = new Vector3(0, y * Time.deltaTime * 0.5f, 0);
-        transform.position += offset;
+        _transform += offset;
 
-        if (transform.position.y > _topExtreme)
+        if (_transform.y > _topExtreme)
         {
-            transform.position = SetY(_topExtreme);
+            _transform = SetY(_topExtreme);
         }
-        else if (transform.position.y < _bottomExtreme)
+        else if (_transform.y < _bottomExtreme)
         {
-            transform.position = SetY(_bottomExtreme);
+            _transform = SetY(_bottomExtreme);
         }
     }
 
@@ -77,10 +84,10 @@ public class ShipMove : MonoBehaviour
         }
 
         var target = SetX(dirMost);
-        transform.position = Vector3.Lerp(transform.position, target, Time.deltaTime * _horizontalMultiplier);
-        if (boundsHit(transform.position.x, dirMost))
+        _transform = Vector3.Lerp(_transform, target, Time.deltaTime * _horizontalMultiplier);
+        if (boundsHit(_transform.x, dirMost))
         {
-            transform.position = SetX(dirMost);
+            _transform = SetX(dirMost);
         }
     }
 
@@ -108,11 +115,20 @@ public class ShipMove : MonoBehaviour
 
     private Vector3 SetX(float x)
     {
-        return new Vector3(x, transform.position.y, transform.position.z);
+        return new Vector3(x, _transform.y, _transform.z);
     }
 
     private Vector3 SetY(float y)
     {
-        return new Vector3(transform.position.x, y, transform.position.z);
+        return new Vector3(_transform.x, y, _transform.z);
+    }
+
+    public void OnTriggerEnter2D(Collider2D collision)
+    {
+        if (collision.tag == "Spawner")
+        {
+            var spawner = collision.GetComponent<Spawner>();
+            spawner.ShipTouch();
+        }
     }
 }
