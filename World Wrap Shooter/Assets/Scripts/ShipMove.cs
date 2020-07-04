@@ -31,6 +31,8 @@ public class ShipMove : MonoBehaviour
     [Tooltip("The camera movement script. This gives us the offset")]
     public CamMove _camMove;
 
+    public float SignedDirection => _direction == Direction.Right ? 1f : -1f;
+
     void Awake()
     {
         _spriteRenderer = GetComponent<SpriteRenderer>();
