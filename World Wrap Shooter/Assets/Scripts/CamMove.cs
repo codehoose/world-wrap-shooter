@@ -1,8 +1,10 @@
 ﻿using UnityEngine;
+using UnityEngine.UI;
 
 public class CamMove : MonoBehaviour
 {
     private float _z;
+    private float _radarPos = -0.36f;
     private Vector3 _position;
 
     [Tooltip("The speed of the camera")]
@@ -25,6 +27,9 @@ public class CamMove : MonoBehaviour
 
     [Tooltip("The right leading camera")]
     public Transform _rightCam;
+
+    [Tooltip("The radar image")]
+    public RawImage _radar;
 
     public Vector3 PositionXY => new Vector3(transform.position.x, transform.position.y, 0);
 
@@ -51,10 +56,25 @@ public class CamMove : MonoBehaviour
         }
     }
 
+    private void UpdateRadarPos()
+    {
+        _radar.uvRect = new Rect(_radarPos,
+                                 _radar.uvRect.y,
+                                 _radar.uvRect.width,
+                                 _radar.uvRect.height);
+    }
+
     private void LateUpdate()
     {
         transform.position = _position;
         _leftCam.position = new Vector3(-4f, 0, _z) + transform.position;
         _rightCam.position = new Vector3(4, 0, _z) + transform.position;
+
+
+        var diff = _right - _left;
+        var offset = _position.x - _left;
+        _radarPos = -0.36f + (offset / diff);
+
+        UpdateRadarPos();
     }
 }
