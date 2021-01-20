@@ -6,6 +6,7 @@ TagManager:
   tags:
   - Spawner
   - Lander
+  - PlayerBullet
   layers:
   - Default
   - TransparentFX

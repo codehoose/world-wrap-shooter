@@ -1,4 +1,5 @@
-﻿using UnityEngine;
+﻿using System.Collections;
+using UnityEngine;
 
 [RequireComponent(typeof(ShipMove))]
 public class LaserFireControl : MonoBehaviour
@@ -9,6 +10,8 @@ public class LaserFireControl : MonoBehaviour
 
     public float _offset = 0.39f;
 
+    public float _cooldown = 0.5f;
+
     // Start is called before the first frame update
     void Awake()
     {
@@ -16,14 +19,24 @@ public class LaserFireControl : MonoBehaviour
     }
 
     // Update is called once per frame
-    void Update()
+    IEnumerator Start()
     {
-        if (Input.GetButtonDown("Fire1"))
+        while (true)
         {
-            var pos = transform.position + new Vector3(_offset * _shipMove.SignedDirection, 0);
-            var copy = Instantiate(_laserPrefab, pos, Quaternion.identity);
-            copy.GetComponent<BulletMove>()._direction = _shipMove.SignedDirection;
-            copy.GetComponent<SpriteRenderer>().flipX = _shipMove.SignedDirection < 0;
+            if (Input.GetButton("Fire1"))
+            {
+                var pos = transform.position + new Vector3(_offset * _shipMove.SignedDirection, 0);
+                var copy = Instantiate(_laserPrefab, pos, Quaternion.identity);
+                var bulletMove = copy.GetComponent<BulletMove>();
+                bulletMove._direction = _shipMove.SignedDirection;
+                bulletMove._onKill = () => _shipMove.AlienKilled();
+                copy.GetComponent<SpriteRenderer>().flipX = _shipMove.SignedDirection < 0;
+                yield return new WaitForSeconds(_cooldown);
+            }
+            else
+            {
+                yield return null;
+            }
         }
     }
 }

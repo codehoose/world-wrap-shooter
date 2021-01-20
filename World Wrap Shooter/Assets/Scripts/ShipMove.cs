@@ -31,7 +31,14 @@ public class ShipMove : MonoBehaviour
     [Tooltip("The camera movement script. This gives us the offset")]
     public CamMove _camMove;
 
+    public int _score;
+
     public float SignedDirection => _direction == Direction.Right ? 1f : -1f;
+
+    public void AlienKilled()
+    {
+        _score += 50;
+    }
 
     void Awake()
     {
